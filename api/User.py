@@ -52,6 +52,13 @@ class User:
         if 'friends' in self.get_data_as_dict()['data']:
             for friend in self.get_data_as_dict()['data']['friends']:
                 friend_data.append(User(friend,None).get_friend_sharable_data())
+        else:
+            return None
+        cur_data = self.get_data_as_dict()['data']
+        cur_data['friends_data'] = {'data':friend_data,'last_updated':dbs_worker.get_current_time()}
+
+        dbs_worker.set_user_data(self.user_id, cur_data)    
+        
         return friend_data
     
     def get_friend_sharable_data(self):

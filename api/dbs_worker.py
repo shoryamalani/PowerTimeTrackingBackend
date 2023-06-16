@@ -67,7 +67,7 @@ def set_up_db_version_1(conn):
     conn[0].commit()
     sys = pypika.Table('sys')
     set_up_version = sys.insert([0,1])
-    users_table = create_database.create_table_command("users",[['UUID','UUID'],['name','text'],['email','text'],['date_created','timestamp'],['privacy_status','text'],['last_login','timestamp'],['data','json']],'UUID')
+    users_table = create_database.create_table_command("users",[['UUID','int PRIMARY KEY SERIAL'],['name','text'],['email','text'],['date_created','timestamp'],['privacy_status','text'],['last_login','timestamp'],['data','json']],'UUID')
     execute_db.execute_database_command(set_up_connection(),users_table)[0].commit()
     # add admin role
     leaderboards_table = create_database.create_table_command("leaderboards",[['id','SERIAL'],['name','text'],['time_period','text'],['data','json']],'id')
@@ -210,3 +210,6 @@ def set_user_data(user_id,data):
     users = pypika.Table('users')
     query = Query.update(users).set(users.data,json.dumps(data)).where(users.uuid == user_id)
     execute_db.execute_database_command(conn,query.get_sql())[0].commit()
+
+def get_current_time():
+    return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
