@@ -105,6 +105,7 @@ def addFriend():
     if friend_user_id is None:
         return jsonify({'error': 'bad friend code'}), 400
     user.add_friend(friend_user_id)
+    User(friend_user_id,None).add_friend(user.user_id)
     print("Added friend " + str(friend_user_id))
     user.get_friend_data()
     return jsonify({'success': friend_user_id})
