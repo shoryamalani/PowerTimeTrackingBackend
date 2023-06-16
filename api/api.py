@@ -54,8 +54,6 @@ def index():
 @app.route('/api/createUser', methods=['POST'])
 def createUser():
     j = request.get_json()
-    if j is None:
-        return jsonify({'error': 'bad request'}), 400
     user = User.create_user(j.get('name'),j.get('privacy_level', None),j.get('device_id', None))
     return jsonify({'user_id': user.get_data_as_dict()['user_id']})
 
