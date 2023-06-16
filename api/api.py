@@ -23,6 +23,9 @@ def authenticate(f):
         user_id = request.headers.get('user_id', None)
         device_id = request.headers.get('device_id', None)
         if user_id is None or device_id is None:
+            print("bad request")
+            print("user_id: " + str(user_id))
+            print("device_id: " + str(device_id))
             return jsonify({'error': 'bad request'}), 400
         user = User(user_id, device_id)
         if user.authenticated:
