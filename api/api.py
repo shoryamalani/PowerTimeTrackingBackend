@@ -106,6 +106,7 @@ def addFriend():
         return jsonify({'error': 'bad friend code'}), 400
     user.add_friend(friend_user_id)
     print("Added friend " + str(friend_user_id))
+    user.get_friend_data()
     return jsonify({'success': friend_user_id})
 
 @app.route('/api/getFriendData', methods=['GET'])
