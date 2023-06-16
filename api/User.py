@@ -44,7 +44,7 @@ class User:
             cur_data['friends'].append(friend_id)
         else:
             cur_data['friends'] = [friend_id]
-            dbs_worker.set_user_data(self.user_id, cur_data)
+        dbs_worker.set_user_data(self.user_id, cur_data)
         self.user_data = dbs_worker.get_user_by_id(self.user_id)
         return True
     def get_friend_data(self):
