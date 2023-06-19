@@ -97,8 +97,9 @@ class User:
         now = dbs_worker.get_current_time()
         final_data = {'expire_time': datetime.datetime.now()+ datetime.timedelta(seconds=180),'data':[]}
         for user in data:
-            cur_data = json.loads(user[2])
+            cur_data = user[2]
             if 'share_data' in  cur_data:
+                print(cur_data['share_data'])
                 if 'leaderboard' in cur_data['share_data']:
                     print(cur_data['share_data']['leaderboard'])
                     for time in cur_data['share_data']['leaderboard']:
