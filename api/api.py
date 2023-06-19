@@ -126,7 +126,7 @@ def saveLiveSharableData():
     print("Saving live data")
     return jsonify({'success': True})
 
-@app.route('/api/saveLeaderboardData', methods=['GET'])
+@app.route('/api/saveLeaderboardData', methods=['POST'])
 @authenticate
 @require_json
 def saveLeaderboardData():
