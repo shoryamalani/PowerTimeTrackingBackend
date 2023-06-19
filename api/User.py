@@ -94,7 +94,7 @@ class User:
         # dbs_worker.get_all_public_users_share_data() # format is user_id, name, data
         data  = dbs_worker.get_all_public_users_share_data()
         print(data)
-        now = dbs_worker.get_current_time()
+        now = datetime.datetime.now()
         final_data = {'expire_time': datetime.datetime.now()+ datetime.timedelta(seconds=180),'data':[]}
         for user in data:
             cur_data = user[2]
