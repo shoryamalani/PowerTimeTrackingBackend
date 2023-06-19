@@ -211,5 +211,17 @@ def set_user_data(user_id,data):
     query = Query.update(users).set(users.data,json.dumps(data)).where(users.uuid == user_id)
     execute_db.execute_database_command(conn,query.get_sql())[0].commit()
 
+def get_all_public_users_share_data():
+    conn = set_up_connection()
+    users = pypika.Table('users')
+    query = Query.from_(users).select(users.uuid,users.name,users.data).where(users.privacy_status == 'public')
+    data = execute_db.execute_database_command(conn,query.get_sql())[1]
+    users = data.fetchall()
+    if users:
+        return users
+    else:
+        return None
+
+
 def get_current_time():
     return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")

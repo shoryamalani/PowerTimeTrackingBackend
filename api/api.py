@@ -105,7 +105,7 @@ def addFriend():
     if friend_user_id is None:
         return jsonify({'error': 'bad friend code'}), 400
     user.add_friend(friend_user_id)
-    User(friend_user_id,None).add_friend(user.user_id)
+    User(friend_user_id,None).add_friend(int(user.user_id))
     print("Added friend " + str(friend_user_id))
     user.get_friend_data()
     return jsonify({'success': friend_user_id})
@@ -126,6 +126,20 @@ def saveLiveSharableData():
     print("Saving live data")
     return jsonify({'success': True})
 
+@app.route('/api/saveLeaderboardData', methods=['GET'])
+@authenticate
+@require_json
+def saveLeaderboardData():
+    j = request.get_json()
+    user:User = g.user
+    user.save_leaderboard_data(j.get('leaderboard_data'),j.get('timing'))
+    print("Saving leaderboard data")
+    return jsonify({'success': True})
+
+@app.route('/api/getLeaderboardData', methods=['GET'])
+@authenticate
+def getLeaderboardData():
+    return jsonify({'leaderboard_data': User.get_leaderboard_data()})
 
 
 if __name__ == "__main__":

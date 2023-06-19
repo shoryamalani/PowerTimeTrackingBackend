@@ -1,5 +1,6 @@
 import dbs_worker
 import uuid
+import datetime
 class User:
     user_data = None
     authenticated = False
@@ -75,7 +76,30 @@ class User:
         else:
             cur_data['share_data'] = {'live': data}
         dbs_worker.set_user_data(self.user_id, cur_data)
+    def save_leaderboard_data(self, data,time,expiry):
+        cur_data = self.get_data_as_dict()['data']
+        if 'share_data' in cur_data:
+            if 'leaderboard' in cur_data['share_data']:
+                cur_data['share_data']['leaderboard'][time] = {'data':data,'last_updated':dbs_worker.get_current_time(),'expiry':datetime.datetime.now() + datetime.timedelta(seconds=expiry)}
+        else:
+            cur_data['share_data'] = {'leaderboard':{time:{'data':data,'last_updated':dbs_worker.get_current_time(), 'expiry':datetime.datetime.now() + datetime.timedelta(seconds=expiry)}}}
 
+        dbs_worker.set_user_data(self.user_id, cur_data)
+    @staticmethod
+    def get_leaderboard_data(self):
+        dbs_worker.get_all_public_users_share_data() # format is user_id, name, data
+        now = dbs_worker.get_current_time()
+        final_data = {'expire_time': datetime.datetime.now()+ datetime.timedelta.total_seconds(180)}
+        for user in dbs_worker.get_all_public_users_share_data():
+            if 'share_data' in  user[2]:
+                if 'leaderboard' in user[2]['share_data']:
+                    for time in user[2]['share_data']['leaderboard']:
+                        if user[2]['share_data']['leaderboard'][time]['expiry'] < now:
+                            if user[0] in final_data:
+                                final_data[user[0]][time] = user[2]['share_data']['leaderboard'][time]
+                            else:
+                                final_data[user[0]] = {time:user[2]['share_data']['leaderboard'][time], 'name':user[1]}
+        return final_data
     
     @staticmethod
     def authenticate_friend_code(user_name,share_code):
@@ -85,6 +109,7 @@ class User:
                 if user[6]['share_code'] == share_code:
                     return user[0]
         return None
+    
 
     
            
