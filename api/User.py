@@ -86,7 +86,7 @@ class User:
 
         dbs_worker.set_user_data(self.user_id, cur_data)
     @staticmethod
-    def get_leaderboard_data(self):
+    def get_leaderboard_data():
         dbs_worker.get_all_public_users_share_data() # format is user_id, name, data
         now = dbs_worker.get_current_time()
         final_data = {'expire_time': datetime.datetime.now()+ datetime.timedelta.total_seconds(180)}
