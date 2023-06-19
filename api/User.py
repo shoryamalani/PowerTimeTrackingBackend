@@ -98,6 +98,7 @@ class User:
         for user in data:
             if 'share_data' in  user[2]:
                 if 'leaderboard' in user[2]['share_data']:
+                    print(user[2]['share_data']['leaderboard'])
                     for time in user[2]['share_data']['leaderboard']:
                         if user[2]['share_data']['leaderboard'][time]['expiry'] < now:
                             if user[0] in final_data['data']:
