@@ -103,7 +103,7 @@ class User:
                 if 'leaderboard' in cur_data['share_data']:
                     print(cur_data['share_data']['leaderboard'])
                     for time in cur_data['share_data']['leaderboard']:
-                        if cur_data['share_data']['leaderboard'][time]['expiry'] < now:
+                        if dbs_worker.get_time_from_format(cur_data['share_data']['leaderboard'][time]['expiry']) < now:
                             if user[0] in final_data['data']:
                                 final_data['data'][user[0]][time] = cur_data['share_data']['leaderboard'][time]
                             else:

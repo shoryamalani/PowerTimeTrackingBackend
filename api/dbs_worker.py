@@ -228,3 +228,6 @@ def get_current_time():
 
 def set_time_in_format(time):
     return time.strftime('%Y-%m-%d %H:%M:%S')
+
+def get_time_from_format(time):
+    return datetime.datetime.strptime(time,'%Y-%m-%d %H:%M:%S')
