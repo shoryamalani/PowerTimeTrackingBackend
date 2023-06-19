@@ -95,7 +95,7 @@ class User:
         data  = dbs_worker.get_all_public_users_share_data()
         print(data)
         now = datetime.datetime.now()
-        final_data = {'expire_time': datetime.datetime.now()+ datetime.timedelta(seconds=180),'data':[]}
+        final_data = {'expire_time': datetime.datetime.now()+ datetime.timedelta(seconds=180),'data':{}}
         for user in data:
             cur_data = user[2]
             if 'share_data' in  cur_data:
