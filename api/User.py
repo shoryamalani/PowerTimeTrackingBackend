@@ -99,7 +99,7 @@ class User:
         for user in data:
             cur_data = user[2]
             if 'share_data' in  cur_data:
-                print(cur_data['share_data'])
+                print(cur_data['share_data'].keys())
                 if 'leaderboard' in cur_data['share_data']:
                     print(cur_data['share_data']['leaderboard'])
                     for time in cur_data['share_data']['leaderboard']:
