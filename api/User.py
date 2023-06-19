@@ -89,16 +89,16 @@ class User:
     def get_leaderboard_data():
         dbs_worker.get_all_public_users_share_data() # format is user_id, name, data
         now = dbs_worker.get_current_time()
-        final_data = {'expire_time': datetime.datetime.now()+ datetime.timedelta(seconds=180)}
+        final_data = {'expire_time': datetime.datetime.now()+ datetime.timedelta(seconds=180),'data':[]}
         for user in dbs_worker.get_all_public_users_share_data():
             if 'share_data' in  user[2]:
                 if 'leaderboard' in user[2]['share_data']:
                     for time in user[2]['share_data']['leaderboard']:
                         if user[2]['share_data']['leaderboard'][time]['expiry'] < now:
-                            if user[0] in final_data:
-                                final_data[user[0]][time] = user[2]['share_data']['leaderboard'][time]
+                            if user[0] in final_data['data']:
+                                final_data['data'][user[0]][time] = user[2]['share_data']['leaderboard'][time]
                             else:
-                                final_data[user[0]] = {time:user[2]['share_data']['leaderboard'][time], 'name':user[1]}
+                                final_data['data'][user[0]] = {time:user[2]['share_data']['leaderboard'][time], 'name':user[1]}
         return final_data
     
     @staticmethod
