@@ -1,5 +1,6 @@
 import dbs_worker
 import uuid
+import json
 import datetime
 class User:
     user_data = None
@@ -96,15 +97,16 @@ class User:
         now = dbs_worker.get_current_time()
         final_data = {'expire_time': datetime.datetime.now()+ datetime.timedelta(seconds=180),'data':[]}
         for user in data:
-            if 'share_data' in  user[2]:
-                if 'leaderboard' in user[2]['share_data']:
-                    print(user[2]['share_data']['leaderboard'])
-                    for time in user[2]['share_data']['leaderboard']:
-                        if user[2]['share_data']['leaderboard'][time]['expiry'] < now:
+            cur_data = json.loads(user[2])
+            if 'share_data' in  cur_data:
+                if 'leaderboard' in cur_data['share_data']:
+                    print(cur_data['share_data']['leaderboard'])
+                    for time in cur_data['share_data']['leaderboard']:
+                        if cur_data['share_data']['leaderboard'][time]['expiry'] < now:
                             if user[0] in final_data['data']:
-                                final_data['data'][user[0]][time] = user[2]['share_data']['leaderboard'][time]
+                                final_data['data'][user[0]][time] = cur_data['share_data']['leaderboard'][time]
                             else:
-                                final_data['data'][user[0]] = {time:user[2]['share_data']['leaderboard'][time], 'name':user[1]}
+                                final_data['data'][user[0]] = {time:cur_data['share_data']['leaderboard'][time], 'name':user[1]}
         return final_data
     
     @staticmethod
