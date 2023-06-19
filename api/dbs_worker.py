@@ -225,3 +225,6 @@ def get_all_public_users_share_data():
 
 def get_current_time():
     return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+def set_time_in_format(time):
+    return time.strftime('%Y-%m-%d %H:%M:%S')

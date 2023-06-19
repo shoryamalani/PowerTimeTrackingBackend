@@ -80,12 +80,12 @@ class User:
         cur_data = self.get_data_as_dict()['data']
         if 'share_data' in cur_data:
             if 'leaderboard' in cur_data['share_data']:
-                cur_data['share_data']['leaderboard'][time] = {'data':data,'last_updated':dbs_worker.get_current_time(),'expiry':datetime.datetime.now() + datetime.timedelta(seconds=expiry)}
+                cur_data['share_data']['leaderboard'][time] = {'data':data,'last_updated':dbs_worker.get_current_time(),'expiry':dbs_worker.set_time_in_format(datetime.datetime.now() + datetime.timedelta(seconds=expiry))}
             else:
-                cur_data['share_data']['leaderboard'] = {time:{'data':data,'last_updated':dbs_worker.get_current_time(), 'expiry':datetime.datetime.now() + datetime.timedelta(seconds=expiry)}}
+                cur_data['share_data']['leaderboard'] = {time:{'data':data,'last_updated':dbs_worker.get_current_time(),'expiry':dbs_worker.set_time_in_format(datetime.datetime.now() + datetime.timedelta(seconds=expiry))}}
 
         else:
-            cur_data['share_data'] = {'leaderboard':{time:{'data':data,'last_updated':dbs_worker.get_current_time(), 'expiry':datetime.datetime.now() + datetime.timedelta(seconds=expiry)}}}
+            cur_data['share_data'] = {'leaderboard':{time:{'data':data,'last_updated':dbs_worker.get_current_time(),'expiry':dbs_worker.set_time_in_format(datetime.datetime.now() + datetime.timedelta(seconds=expiry))}}}
 
         dbs_worker.set_user_data(self.user_id, cur_data)
     @staticmethod
@@ -113,6 +113,3 @@ class User:
                     return user[0]
         return None
     
-
-    
-           
