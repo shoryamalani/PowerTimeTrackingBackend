@@ -132,7 +132,14 @@ def saveLiveSharableData():
 def saveLeaderboardData():
     j = request.get_json()
     user:User = g.user
-    user.save_leaderboard_data(j.get('leaderboard_data'),j.get('timing'),j.get('expiary'))
+    expiary = 1000000
+    if j.get('timing') == 'daily':
+        expiary = 86400
+    elif j.get('timing') == 'weekly':
+        expiary = 604800
+    elif j.get('timing') == 'monthly':
+        expiary = 2592000
+    user.save_leaderboard_data(j.get('leaderboard_data'),j.get('timing'),expiary)
     print("Saving leaderboard data")
     return jsonify({'success': True})
 
