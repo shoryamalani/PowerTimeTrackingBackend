@@ -6,7 +6,6 @@ import psycopg2
 import datetime
 import pypika
 from pypika import functions,Query
-from concurrent.futures import ThreadPoolExecutor, as_completed, wait
 def is_docker():
     path = '/proc/self/cgroup'
     return (
@@ -32,15 +31,15 @@ def set_up_connection():
 
         # dotenv_path = os.path.join(os.path.dirname(__file__), '/postgres/.env')
         # print(dotenv_path)
-        print(os.listdir())
+        # print(os.listdir())
         # # Load file from the path
         # print(dotenv.load_dotenv(dotenv_path,verbose=True))
         # print(dotenv.dotenv_values(dotenv_path).items())
         dotenv.load_dotenv()
 
         # set up connection to postgres
-        print(os.environ)
-        print(os.environ.get('DB_HOST'))
+        # print(os.environ)
+        # print(os.environ.get('DB_HOST'))
 
         conn = psycopg2.connect(
             host=os.environ.get('DB_HOST'),
@@ -69,7 +68,6 @@ def set_up_db_version_1(conn):
     set_up_version = sys.insert([0,1])
     users_table = create_database.create_table_command("users",[['UUID','SERIAL'],['name','text'],['email','text'],['date_created','timestamp'],['privacy_status','text'],['last_login','timestamp'],['data','json']],'UUID')
     execute_db.execute_database_command(set_up_connection(),users_table)[0].commit()
-    # add admin role
     leaderboards_table = create_database.create_table_command("leaderboards",[['id','SERIAL'],['name','text'],['time_period','text'],['data','json']],'id')
     execute_db.execute_database_command(set_up_connection(),leaderboards_table)[0].commit()
     # groups
@@ -78,18 +76,26 @@ def set_up_db_version_1(conn):
 
     execute_db.execute_database_command(set_up_connection(),set_up_version.get_sql())[0].commit()
 
+def set_up_db_version_2(conn):
+    # add live focus modes
+    live_focus_modes_table = create_database.create_table_command("live_focus_modes",[['id','SERIAL'],['name','text'],['data','json']],'id')
+    execute_db.execute_database_command(set_up_connection(),live_focus_modes_table)[0].commit()
+    set_db_version(2)
 
 def set_db_version(version):
     conn = set_up_connection()
     sys = pypika.Table('sys')
     query = sys.update().set(sys.version,version)
     execute_db.execute_database_command(conn,query.get_sql())[0].commit()
+    
 
 def db_init():
     conn = set_up_connection()
     print(get_db_version(conn))
     if get_db_version(conn) < 1:
         set_up_db_version_1(conn)
+    if get_db_version(conn) < 2:
+        set_up_db_version_2(conn)
 def get_all_users():
     conn = set_up_connection()
     users = pypika.Table('users')
@@ -222,6 +228,35 @@ def get_all_public_users_share_data():
     else:
         return None
 
+# live focus mode functions
+
+def get_live_focus_modes_by_id(id):
+    conn = set_up_connection()
+    live_focus_modes = pypika.Table('live_focus_modes')
+    query = Query.from_(live_focus_modes).select('*').where(live_focus_modes.id == id)
+    data = execute_db.execute_database_command(conn,query.get_sql())[1]
+    live_focus_modes = data.fetchone()
+    if live_focus_modes:
+        return live_focus_modes
+    else:
+        return None
+    
+def create_live_focus_mode(name,data):
+    conn = set_up_connection()
+    live_focus_modes = pypika.Table('live_focus_modes')
+    query = Query.into(live_focus_modes).columns('name','data').insert(name,json.dumps(data))
+    [conn,cur] =  execute_db.execute_database_command(conn,query.get_sql()+" RETURNING id as id;")
+    conn.commit()
+    data = cur.fetchone()[0]
+    return data
+
+def set_live_focus_mode_data(id,data):
+    conn = set_up_connection()
+    live_focus_modes = pypika.Table('live_focus_modes')
+    query = Query.update(live_focus_modes).set(live_focus_modes.data,json.dumps(data)).where(live_focus_modes.id == id)
+    execute_db.execute_database_command(conn,query.get_sql())[0].commit()
+
+# time functions
 
 def get_current_time():
     return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")

@@ -1,7 +1,6 @@
 import time
 from flask import Flask, jsonify, request , redirect, url_for, request, session
 from flask_cors import CORS
-from flask_socketio import SocketIO, send, emit, join_room, leave_room
 import dbs_worker
 import os
 import json
@@ -9,13 +8,14 @@ from functools import wraps
 from flask import g, request, redirect, url_for
 from flask_session import Session
 from User import User
+from LiveFocusModes import LiveFocusMode
 import uuid
+import eventlet
 app = Flask(__name__, static_folder='../build', static_url_path='/')
 SESSION_TYPE = 'filesystem'
 app.config.from_object(__name__)
 Session(app)
 CORS(app)
-socketio = SocketIO(app, cors_allowed_origins="*")
 
 def authenticate(f):
     @wraps(f)
@@ -132,21 +132,128 @@ def saveLiveSharableData():
 def saveLeaderboardData():
     j = request.get_json()
     user:User = g.user
-    expiary = 1000000
+    expiry = 1000000
     if j.get('timing') == 'daily':
-        expiary = 86400
+        expiry = 86400
     elif j.get('timing') == 'weekly':
-        expiary = 604800
+        expiry = 604800
     elif j.get('timing') == 'monthly':
-        expiary = 2592000
-    user.save_leaderboard_data(j.get('leaderboard_data'),j.get('timing'),expiary)
+        expiry = 2592000
+    user.save_leaderboard_data(j.get('leaderboard_data'),j.get('timing'),expiry)
     print("Saving leaderboard data")
     return jsonify({'success': True})
 
 @app.route('/api/getLeaderboardData', methods=['GET'])
-@authenticate
 def getLeaderboardData():
     return jsonify({'leaderboard_data': User.get_leaderboard_data()})
+
+# live focus mode requests
+@app.route("/api/getLiveFocusModeData", methods=['GET'])
+@authenticate
+def getLiveFocusModeData():
+    user:User = g.user
+    requests = user.get_live_focus_mode_requests()
+    final_requests = []
+    for request in requests:
+        focus = LiveFocusMode(request)
+        if focus.is_active() != True:
+            User(request,None).remove_live_focus_mode_request(user.get_current_live_focus_mode().id)
+        else:
+            final_requests.append(focus.get_data_as_dictionary())
+    focus = user.get_current_live_focus_mode()
+    if focus != None:
+        if focus.is_active() != True:
+            user.remove_current_live_focus_mode()
+    return jsonify({'data': None if focus == None else focus.get_data_as_dictionary(),'requests': final_requests, 'status': 'success'})
+
+@app.route('/api/createLiveFocusMode', methods=['POST'])
+@authenticate
+@require_json
+def createLiveFocusMode():
+    j = request.get_json()
+    user:User = g.user
+    live_focus_mode = LiveFocusMode.create_live_focus_mode(j.get('name'),user.user_id)
+    user.add_current_live_focus_mode(live_focus_mode.id)
+    return jsonify({'status': 'success'})
+
+@app.route('/api/getLiveFocusModeRequests', methods=['GET'])
+@authenticate
+def getLiveFocusModeRequests():
+    user:User = g.user
+
+    return jsonify({'live_focus_mode_requests': user.get_live_focus_mode_requests()})
+
+@app.route('/api/updateLiveFocusMode', methods=['POST'])
+@authenticate
+@require_json
+def updateLiveFocusMode():
+    j = request.get_json()
+    user:User = g.user
+    print("Updating live focus mode")
+    focus = user.get_current_live_focus_mode()
+    if focus == None:
+        return jsonify({'error': 'not active'}), 400
+    try:
+        if not focus.is_active():
+            return jsonify({'error': 'not active'}), 200
+    except:
+        return jsonify({'error': 'not active'}), 200
+    focus.update_user_data(user.user_id,j.get('data'))
+    return jsonify({'data': focus.get_data_as_dictionary()})
+
+@app.route('/api/addLiveFocusModeMember', methods=['POST'])
+@authenticate
+@require_json
+def addLiveFocusModeMember():
+    j = request.get_json()
+    user:User = g.user
+    focus = user.get_current_live_focus_mode()
+    focus.add_member(j.get('user_id'))
+    User(j.get('user_id'),None).add_live_focus_mode_request(user.get_current_live_focus_mode().id)
+    return jsonify({'data': focus.get_data_as_dictionary()})
+
+@app.route('/api/inviteToLiveFocusMode', methods=['POST'])
+@authenticate
+@require_json
+def inviteLiveFocusMode():
+    j = request.get_json()
+    user:User = g.user
+    focus = user.get_current_live_focus_mode()
+    if focus == None:
+        return jsonify({'error': 'not active'}), 400
+    focus.add_invited_member(j.get('user_id'))
+    User(j.get('user_id'),None).add_live_focus_mode_request(user.get_current_live_focus_mode().id)
+    return jsonify({'data': focus.get_data_as_dictionary()})
+@app.route('/api/joinLiveFocusMode', methods=['POST'])
+@authenticate
+@require_json
+def joinLiveFocusMode():
+    j = request.get_json()
+    user:User = g.user
+    focus = LiveFocusMode(j.get('live_focus_mode_id'))
+    focus.add_member(user.user_id)
+    user.add_current_live_focus_mode(focus.id)
+    user.remove_live_focus_mode_request(focus.id)
+    return jsonify({'data': focus.get_data_as_dictionary()})
+@app.route('/api/leaveLiveFocusMode', methods=['POST'])
+@authenticate
+def leaveLiveFocusMode():
+    user:User = g.user
+    focus = user.get_current_live_focus_mode()
+    focus.remove_member(user.user_id)
+    user.remove_current_live_focus_mode()
+    return jsonify({'success': True})
+
+@app.route('/api/endLiveFocusMode', methods=['POST'])
+@authenticate
+def endLiveFocusMode():
+    user:User = g.user
+    focus = user.get_current_live_focus_mode()
+    if focus == None:
+        return jsonify({'error': 'not active'}), 400
+    focus.deactivate()
+    user.remove_current_live_focus_mode()
+    return jsonify({'success': True})
 
 
 if __name__ == "__main__":

@@ -19,3 +19,5 @@ pyu2f
 psycopg2-binary
 flask-socketio
 flask-cors
+eventlet==0.29.1
+

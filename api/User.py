@@ -2,6 +2,7 @@ import dbs_worker
 import uuid
 import json
 import datetime
+from LiveFocusModes import LiveFocusMode
 class User:
     user_data = None
     authenticated = False
@@ -43,7 +44,8 @@ class User:
         if 'friends' in cur_data:
             if friend_id in cur_data['friends']:
                 pass
-            cur_data['friends'].append(friend_id)
+            else:
+                cur_data['friends'].append(friend_id)
         else:
             cur_data['friends'] = [friend_id]
         dbs_worker.set_user_data(self.user_id, cur_data)
@@ -88,6 +90,47 @@ class User:
         else:
             cur_data['share_data'] = {'leaderboard':{time:{'data':data,'last_updated':dbs_worker.get_current_time(),'expiry':dbs_worker.set_time_in_format(datetime.datetime.now() + datetime.timedelta(seconds=expiry))}}}
 
+        dbs_worker.set_user_data(self.user_id, cur_data)
+
+    def add_live_focus_mode_request(self, data):
+        cur_data = self.get_data_as_dict()['data']
+        if 'focus_mode_requests' in cur_data:
+            cur_data['focus_mode_requests'].append(data)
+        else:
+            cur_data['focus_mode_requests'] = [data]
+        dbs_worker.set_user_data(self.user_id, cur_data)
+    
+    def get_live_focus_mode_requests(self):
+        cur_data = self.get_data_as_dict()['data']
+        if 'focus_mode_requests' in cur_data:
+            return cur_data['focus_mode_requests']
+        else:
+            return []
+    
+    def get_current_live_focus_mode(self):
+        cur_data = self.get_data_as_dict()['data']
+        if 'current_live_focus_mode' in cur_data:
+            if cur_data['current_live_focus_mode'] == None:
+                return None
+            return LiveFocusMode(cur_data['current_live_focus_mode'])
+        else:
+            return None
+    
+    def remove_live_focus_mode_request(self, id):
+        cur_data = self.get_data_as_dict()['data']
+        if 'focus_mode_requests' in cur_data:
+            cur_data['focus_mode_requests'].remove(id)
+        else:
+            return None
+        dbs_worker.set_user_data(self.user_id, cur_data)
+
+    def add_current_live_focus_mode(self,id):
+        cur_data = self.get_data_as_dict()['data']
+        cur_data['current_live_focus_mode'] = id
+        dbs_worker.set_user_data(self.user_id, cur_data)
+    def remove_current_live_focus_mode(self):
+        cur_data = self.get_data_as_dict()['data']
+        cur_data['current_live_focus_mode'] = None
         dbs_worker.set_user_data(self.user_id, cur_data)
     @staticmethod
     def get_leaderboard_data():
