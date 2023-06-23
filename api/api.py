@@ -157,7 +157,7 @@ def getLiveFocusModeData():
     for request in requests:
         focus = LiveFocusMode(request)
         if focus.is_active() != True:
-            User(request,None).remove_live_focus_mode_request(user.get_current_live_focus_mode().id)
+            User(request,None).remove_live_focus_mode_request(focus.id)
         else:
             final_requests.append(focus.get_data_as_dictionary())
     focus = user.get_current_live_focus_mode()
