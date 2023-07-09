@@ -80,6 +80,7 @@ def changePrivacy():
 @app.route('/api/createDeviceId', methods=['GET'])
 def createDeviceId():
     id = str(uuid.uuid4())
+    dbs_worker.add_user_to_users_number()
     return jsonify({'device_id': id})
 
 @app.route('/api/setDisplayName', methods=['POST'])

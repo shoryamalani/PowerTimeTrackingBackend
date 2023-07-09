@@ -60,9 +60,7 @@ class User:
             return None
         cur_data = self.get_data_as_dict()['data']
         cur_data['friends_data'] = {'data':friend_data,'last_updated':dbs_worker.get_current_time()}
-
         dbs_worker.set_user_data(self.user_id, cur_data)    
-        
         return friend_data
     
     def get_friend_sharable_data(self):
@@ -95,7 +93,10 @@ class User:
     def add_live_focus_mode_request(self, data):
         cur_data = self.get_data_as_dict()['data']
         if 'focus_mode_requests' in cur_data:
-            cur_data['focus_mode_requests'].append(data)
+            if data in cur_data['focus_mode_requests']:
+                pass
+            else:
+                cur_data['focus_mode_requests'].append(data)
         else:
             cur_data['focus_mode_requests'] = [data]
         dbs_worker.set_user_data(self.user_id, cur_data)

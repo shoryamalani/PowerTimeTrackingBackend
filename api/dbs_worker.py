@@ -82,6 +82,33 @@ def set_up_db_version_2(conn):
     execute_db.execute_database_command(set_up_connection(),live_focus_modes_table)[0].commit()
     set_db_version(2)
 
+def set_up_db_version_3(conn):
+    # create a users number table
+    users_number_table = create_database.create_table_command("users_number",[['id','SERIAL'],['number','int']],'id')
+    execute_db.execute_database_command(set_up_connection(),users_number_table)[0].commit()
+    # add 0 to users number to id 0
+    insert_users_number = "INSERT INTO users_number (id,number) VALUES (0,0);"
+    execute_db.execute_database_command(set_up_connection(),insert_users_number)[0].commit()
+    set_db_version(3)
+
+
+def get_current_users_count():
+    conn = set_up_connection()
+    users_number = pypika.Table('users_number')
+    # get where id = 0
+    query = Query.from_(users_number).select('*').where(users_number.id == 0)
+    data = execute_db.execute_database_command(conn,query.get_sql())[1]
+    return data.fetchone()[1]
+
+def add_user_to_users_number():
+    conn = set_up_connection()
+    users_number = pypika.Table('users_number')
+    # get where id = 0
+    current_users = get_current_users_count()
+    query = Query.update(users_number).set(users_number.number,current_users+1).where(users_number.id == 0)
+    execute_db.execute_database_command(conn,query.get_sql())[0].commit()
+
+
 def set_db_version(version):
     conn = set_up_connection()
     sys = pypika.Table('sys')
