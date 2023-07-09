@@ -123,6 +123,8 @@ def db_init():
         set_up_db_version_1(conn)
     if get_db_version(conn) < 2:
         set_up_db_version_2(conn)
+    if get_db_version(conn) < 3:
+        set_up_db_version_3(conn)
 def get_all_users():
     conn = set_up_connection()
     users = pypika.Table('users')
