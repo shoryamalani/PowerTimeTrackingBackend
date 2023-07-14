@@ -46,6 +46,8 @@ class User:
                 pass
             else:
                 cur_data['friends'] = [friend_id, *cur_data['friends']]
+                print('added friend')
+                print(cur_data['friends'])
         else:
             cur_data['friends'] = [friend_id]
         dbs_worker.set_user_data(self.user_id, cur_data)
