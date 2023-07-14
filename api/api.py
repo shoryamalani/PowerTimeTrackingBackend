@@ -235,7 +235,7 @@ def joinLiveFocusMode():
     focus.add_member(user.user_id)
     user.add_current_live_focus_mode(focus.id)
     user.remove_live_focus_mode_request(focus.id)
-    return jsonify({'data': focus.get_data_as_dictionary()})
+    return jsonify({'data': focus.get_data_as_dictionary(), 'status': 'success'})
 @app.route('/api/leaveLiveFocusMode', methods=['POST'])
 @authenticate
 def leaveLiveFocusMode():
