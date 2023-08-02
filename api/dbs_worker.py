@@ -96,9 +96,10 @@ def set_up_db_version_4(conn):
     users_number_table = create_database.create_table_command("mobile_devices",[['id','SERIAL'],['device_id','text'],['last_login','timestamp'],['date_created','timestamp'],['share_code','text'],['data','json']],'id')
     execute_db.execute_database_command(set_up_connection(),users_number_table)[0].commit()
     # add a mobile_device_id to the users table
-    users = pypika.Table('users')
-    query = Query.alter_table(users).add_column('mobile_device_id','text')
-    execute_db.execute_database_command(set_up_connection(),query.get_sql())[0].commit()
+    # users = pypika.Table('users')
+    # query = Query.alter_table(users).add_column('mobile_device_id','text')
+    query_sql = "ALTER TABLE users ADD COLUMN mobile_device_id text;"
+    execute_db.execute_database_command(set_up_connection(),query_sql)[0].commit()
     set_db_version(4)
 
 def get_current_users_count():
