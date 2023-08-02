@@ -11,9 +11,11 @@ from User import User
 from LiveFocusModes import LiveFocusMode
 import uuid
 import eventlet
+from mobileApi import mobileApp
 app = Flask(__name__, static_folder='../build', static_url_path='/')
 SESSION_TYPE = 'filesystem'
 app.config.from_object(__name__)
+app.register_blueprint(mobileApp, url_prefix='/mobile')
 Session(app)
 CORS(app)
 
@@ -255,6 +257,9 @@ def endLiveFocusMode():
     focus.deactivate()
     user.remove_current_live_focus_mode()
     return jsonify({'success': True})
+
+
+
 
 
 if __name__ == "__main__":

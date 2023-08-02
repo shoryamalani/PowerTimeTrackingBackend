@@ -91,6 +91,15 @@ def set_up_db_version_3(conn):
     execute_db.execute_database_command(set_up_connection(),insert_users_number)[0].commit()
     set_db_version(3)
 
+def set_up_db_version_4(conn):
+    # create the mobile devices table
+    users_number_table = create_database.create_table_command("mobile_devices",[['id','SERIAL'],['device_id','text'],['last_login','timestamp'],['date_created','timestamp'],['share_code','text'],['data','json']],'id')
+    execute_db.execute_database_command(set_up_connection(),users_number_table)[0].commit()
+    # add a mobile_device_id to the users table
+    users = pypika.Table('users')
+    query = Query.alter_table(users).add_column('mobile_device_id','text')
+    execute_db.execute_database_command(set_up_connection(),query.get_sql())[0].commit()
+    set_db_version(4)
 
 def get_current_users_count():
     conn = set_up_connection()
@@ -125,6 +134,8 @@ def db_init():
         set_up_db_version_2(conn)
     if get_db_version(conn) < 3:
         set_up_db_version_3(conn)
+    if get_db_version(conn) < 4:
+        set_up_db_version_4(conn)
 def get_all_users():
     conn = set_up_connection()
     users = pypika.Table('users')
@@ -285,8 +296,27 @@ def set_live_focus_mode_data(id,data):
     query = Query.update(live_focus_modes).set(live_focus_modes.data,json.dumps(data)).where(live_focus_modes.id == id)
     execute_db.execute_database_command(conn,query.get_sql())[0].commit()
 
-# time functions
 
+# mobile device functions
+def check_if_device_id_exists(device_id):
+    conn = set_up_connection()
+    mobile_devices = pypika.Table('mobile_devices')
+    query = Query.from_(mobile_devices).select('*').where(mobile_devices.device_id == device_id)
+    data = execute_db.execute_database_command(conn,query.get_sql())[1]
+    mobile_device = data.fetchone()
+    if mobile_device:
+        return mobile_device
+    else:
+        return None
+
+def add_mobile_device(device_id):
+    conn = set_up_connection()
+    mobile_devices = pypika.Table('mobile_devices')
+    query = Query.into(mobile_devices).columns('device_id','last_login','date_created','data').insert(device_id,functions.Now(),functions.Now(),json.dumps({}))
+    execute_db.execute_database_command(conn,query.get_sql())[0].commit()
+
+
+# time functions
 def get_current_time():
     return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
