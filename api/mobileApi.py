@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request, g
 import dbs_worker
 mobileApp = Blueprint('mobileApp', __name__)
 
-@mobileApp.route('/addMobileDeviceAndLogin', methods=['GET'])
+@mobileApp.route('/addMobileDeviceAndLogin', methods=['POST'])
 def addMobileDeviceAndLogin():
     request_data = request.get_json()
     if request_data is None:
