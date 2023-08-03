@@ -102,6 +102,13 @@ def set_up_db_version_4(conn):
     execute_db.execute_database_command(set_up_connection(),query_sql)[0].commit()
     set_db_version(4)
 
+def set_up_db_version_5(conn):
+    # add a mobile message uuid
+    query_sql = "ALTER TABLE users ADD COLUMN mobile_message_uuid text;"
+    execute_db.execute_database_command(set_up_connection(),query_sql)[0].commit()
+    set_db_version(5)
+
+
 def get_current_users_count():
     conn = set_up_connection()
     users_number = pypika.Table('users_number')
@@ -137,6 +144,9 @@ def db_init():
         set_up_db_version_3(conn)
     if get_db_version(conn) < 4:
         set_up_db_version_4(conn)
+    if get_db_version(conn) < 5:
+        set_up_db_version_5(conn)
+
 def get_all_users():
     conn = set_up_connection()
     users = pypika.Table('users')
@@ -310,10 +320,17 @@ def check_if_device_id_exists(device_id):
     else:
         return None
 
+
 def add_mobile_device(device_id):
     conn = set_up_connection()
     mobile_devices = pypika.Table('mobile_devices')
     query = Query.into(mobile_devices).columns('device_id','last_login','date_created','data').insert(device_id,functions.Now(),functions.Now(),json.dumps({}))
+    execute_db.execute_database_command(conn,query.get_sql())[0].commit()
+
+def add_mobile_notification_code(device_id,notification_code):
+    conn = set_up_connection()
+    mobile_devices = pypika.Table('mobile_devices')
+    query = Query.update(mobile_devices).set(mobile_devices.notification_code,notification_code).where(mobile_devices.device_id == device_id)
     execute_db.execute_database_command(conn,query.get_sql())[0].commit()
 
 
