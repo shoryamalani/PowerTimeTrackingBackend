@@ -19,8 +19,12 @@ def addMobileDeviceAndLogin():
 
 @mobileApp.route('/addMobileNotificationCode', methods=['POST'])
 def addMobileNotificationCode():
-    device_id = request.args.get('device_id')
-    notification_code = request.args.get('notification_code')
+    request_data = request.get_json()
+    if request_data is None:
+        return jsonify({'status': 'error'}), 400
+    device_id = request_data.get('device_id')
+    notification_code = request_data.get('notification_code')
+    
     if device_id is None or notification_code is None:
         return jsonify({'status': 'error'}), 400
     cur = dbs_worker.check_if_device_id_exists(device_id)
