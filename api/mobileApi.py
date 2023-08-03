@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request, g
 import dbs_worker
+import base64
 mobileApp = Blueprint('mobileApp', __name__)
 
 @mobileApp.route('/addMobileDeviceAndLogin', methods=['POST'])
@@ -24,12 +25,14 @@ def addMobileNotificationCode():
         return jsonify({'status': 'error'}), 400
     device_id = request_data.get('device_id')
     notification_code = request_data.get('notification_code')
-    
+
     if device_id is None or notification_code is None:
         return jsonify({'status': 'error'}), 400
     cur = dbs_worker.check_if_device_id_exists(device_id)
     if cur is None:
         return jsonify({'status': 'error'}), 400
     else:
-        dbs_worker.add_mobile_notification_code(device_id, notification_code)
+        d = base64.b64decode(notification_code)
+        d1=''.join(['{:02x}'.format(i) for i in d])
+        dbs_worker.add_mobile_notification_code(device_id, d1)
         return jsonify({'status': 'success'})
