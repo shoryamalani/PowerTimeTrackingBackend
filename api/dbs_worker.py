@@ -104,7 +104,7 @@ def set_up_db_version_4(conn):
 
 def set_up_db_version_5(conn):
     # add a mobile message uuid
-    query_sql = "ALTER TABLE users ADD COLUMN mobile_message_uuid text;"
+    query_sql = "ALTER TABLE mobile_devices ADD COLUMN notification_code text;"
     execute_db.execute_database_command(set_up_connection(),query_sql)[0].commit()
     set_db_version(5)
 
