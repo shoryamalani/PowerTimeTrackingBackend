@@ -33,7 +33,6 @@ def authenticate(f):
             return jsonify({'error': 'bad request'}), 400
         user = User(user_id, device_id)
         if user.authenticated:
-            print("authenticated")
             g.user = user
             return f(*args, **kwargs)
         else:
@@ -127,7 +126,7 @@ def saveLiveSharableData():
     user:User = g.user
     user.save_live_sharable_data(j.get('live_data'))
     print("Saving live data")
-    return jsonify({'success': True})
+    return jsonify({'success': True, 'user_data': user.get_data_as_dict()})
 
 @app.route('/api/saveLeaderboardData', methods=['POST'])
 @authenticate
@@ -258,7 +257,16 @@ def endLiveFocusMode():
     user.remove_current_live_focus_mode()
     return jsonify({'success': True})
 
-
+# mobile connection
+@app.route('/api/addPhone', methods=['POST'])
+@authenticate
+@require_json
+def addPhone():
+    j = request.get_json()
+    user:User = g.user
+    phone_id = dbs_worker.get_phone_id_from_code(j.get('phone_share_code'))
+    user.add_phone_number(phone_id)
+    return jsonify({'success': True, 'mobile_devices': user.get_data_as_dict()['mobile_devices']})
 
 
 

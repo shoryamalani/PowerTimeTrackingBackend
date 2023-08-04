@@ -108,6 +108,21 @@ def set_up_db_version_5(conn):
     execute_db.execute_database_command(set_up_connection(),query_sql)[0].commit()
     set_db_version(5)
 
+def set_up_db_version_6(conn):
+    # add mobile share code expiry
+    query_sql = "ALTER TABLE mobile_devices ADD COLUMN share_code_expiry timestamp;"
+    execute_db.execute_database_command(set_up_connection(),query_sql)[0].commit()
+    set_db_version(6)
+
+def set_up_db_version_7(conn):
+    # change mobile_device_id to mobile_devices and change type to json
+    query_sql = "ALTER TABLE users RENAME COLUMN mobile_device_id TO mobile_devices;"
+    execute_db.execute_database_command(set_up_connection(),query_sql)[0].commit()
+    query_sql = "ALTER TABLE users ALTER COLUMN mobile_devices TYPE json USING mobile_devices::json;"
+    execute_db.execute_database_command(set_up_connection(),query_sql)[0].commit()
+    set_db_version(7)
+
+
 
 def get_current_users_count():
     conn = set_up_connection()
@@ -146,6 +161,8 @@ def db_init():
         set_up_db_version_4(conn)
     if get_db_version(conn) < 5:
         set_up_db_version_5(conn)
+    if get_db_version(conn) < 6:
+        set_up_db_version_6(conn)
 
 def get_all_users():
     conn = set_up_connection()
@@ -307,6 +324,12 @@ def set_live_focus_mode_data(id,data):
     query = Query.update(live_focus_modes).set(live_focus_modes.data,json.dumps(data)).where(live_focus_modes.id == id)
     execute_db.execute_database_command(conn,query.get_sql())[0].commit()
 
+# inter mobile desktop functions
+def set_user_mobile_devices(user_id,mobile_devices):
+    conn = set_up_connection()
+    users = pypika.Table('users')
+    query = Query.update(users).set(users.mobile_devices,json.dumps(mobile_devices)).where(users.uuid == user_id)
+    execute_db.execute_database_command(conn,query.get_sql())[0].commit()
 
 # mobile device functions
 def check_if_device_id_exists(device_id):
@@ -320,6 +343,16 @@ def check_if_device_id_exists(device_id):
     else:
         return None
 
+def get_phone_id_from_code(code):
+    conn = set_up_connection()
+    mobile_devices = pypika.Table('mobile_devices')
+    query = Query.from_(mobile_devices).select('*').where(mobile_devices.share_code == code).where(mobile_devices.share_code_expiry > functions.Now())
+    data = execute_db.execute_database_command(conn,query.get_sql())[1]
+    mobile_device = data.fetchone()
+    if mobile_device:
+        return mobile_device
+    else:
+        return None
 
 def add_mobile_device(device_id):
     conn = set_up_connection()
@@ -333,6 +366,11 @@ def add_mobile_notification_code(device_id,notification_code):
     query = Query.update(mobile_devices).set(mobile_devices.notification_code,notification_code).where(mobile_devices.device_id == device_id)
     execute_db.execute_database_command(conn,query.get_sql())[0].commit()
 
+def add_mobile_connect_code(device_id,connect_code):
+    conn = set_up_connection()
+    mobile_devices = pypika.Table('mobile_devices')
+    query = Query.update(mobile_devices).set(mobile_devices.share_code,connect_code).set(mobile_devices.share_code_expiry,functions.Now() + datetime.timedelta(days=1)).where(mobile_devices.device_id == device_id)
+    execute_db.execute_database_command(conn,query.get_sql())[0].commit()
 
 # time functions
 def get_current_time():

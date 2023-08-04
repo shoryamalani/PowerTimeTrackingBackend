@@ -30,6 +30,7 @@ class User:
             'privacy_status': self.user_data[4],
             'last_login': self.user_data[5],
             'data': self.user_data[6],
+            'mobile_devices': self.user_data[7],
         }     
     def set_display_name(self, name):
         dbs_worker.set_user_display_name(self.user_id, name)
@@ -135,6 +136,20 @@ class User:
         cur_data = self.get_data_as_dict()['data']
         cur_data['current_live_focus_mode'] = None
         dbs_worker.set_user_data(self.user_id, cur_data)
+
+    def add_phone_number(self, phone_number):
+        cur_data = self.get_data_as_dict()['mobile_devices']
+        if cur_data == None:
+            cur_data = {
+                'phone_id': [phone_number],
+                'settings': {
+
+                }
+            }
+        else:
+            cur_data['phone_id'] = [phone_number, *cur_data['phone_id']]
+        dbs_worker.set_user_mobile_devices(self.user_id, cur_data)
+
     @staticmethod
     def get_leaderboard_data():
         # dbs_worker.get_all_public_users_share_data() # format is user_id, name, data
