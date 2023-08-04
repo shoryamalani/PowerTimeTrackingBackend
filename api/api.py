@@ -269,7 +269,7 @@ def addPhone():
     user.add_phone_number(phone_id)
     return jsonify({'success': True, 'user_data': user.get_data_as_dict()})
 
-@app.route("/api/startFocusModeOnPhone")
+@app.route("/api/startFocusModeOnPhone", methods=['POST'])
 @authenticate
 def startFocusModeOnPhone():
     j = request.get_json()
