@@ -148,7 +148,11 @@ class User:
                 }
             }
         else:
-            cur_data['phone_id'] = [phone_number, *cur_data['phone_id']]
+            if 'phone_ids' in cur_data:
+                if phone_number in cur_data['phone_ids']:
+                    pass
+                else:
+                    cur_data['phone_ids'] = [phone_number, *cur_data['phone_ids']]
         dbs_worker.set_user_mobile_devices(self.user_id, cur_data)
 
     @staticmethod
