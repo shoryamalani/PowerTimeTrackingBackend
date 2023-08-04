@@ -37,7 +37,7 @@ def addMobileNotificationCode():
         d1=''.join(['{:02x}'.format(i) for i in d])
         dbs_worker.add_mobile_notification_code(device_id, d1)
         return jsonify({'status': 'success'})
-@mobileApp.route('/getPhoneConnectCode', methods=['POST'])
+@mobileApp.route('/getMobileConnectCode', methods=['GET','POST'])
 def getPhoneConnectCode():
     request_data = request.get_json()
     if request_data is None:
