@@ -3,6 +3,8 @@ import uuid
 import json
 import datetime
 from LiveFocusModes import LiveFocusMode
+import requests
+import constants
 class User:
     user_data = None
     authenticated = False
@@ -154,7 +156,42 @@ class User:
                 else:
                     cur_data['phone_ids'] = [phone_number, *cur_data['phone_ids']]
         dbs_worker.set_user_mobile_devices(self.user_id, cur_data)
+    def save_current_focus_mode(self,duration,name,type):
+        cur_data = self.get_data_as_dict()['data']
+        cur_data['current_focus_mode'] = {'duration':duration,'name':name,'type':type}
+        dbs_worker.set_user_data(self.user_id, cur_data)
+    
+    def send_notification_to_phone(self,title,subtitle,body):
+#         curl -v \
+#   --header "authorization: bearer ${AUTHENTICATION_TOKEN}" \
+#   --header "apns-topic: com.shoryamalani.fixate" \
+#   --header "apns-push-type: alert" \
+#   --header "apns-priority: 5" \
+#   --header "apns-expiration: 0" \
+#   --data '{"aps":{"alert":{"title":"Focus Title","subtitle":"Start a focus mode","body":"Click on the notification to continue the focus mode on your phone"}}}' \
+#   --http2  https://api.development.push.apple.com:443/3/device/
+        phone_ids = self.get_data_as_dict()['mobile_devices']['phone_ids']
+        device_ids = []
+        for phone_id in phone_ids:
+            get_phone_data = dbs_worker.get_phone_data(phone_id)
+            if get_phone_data[6] != None:
+                device_ids.append(get_phone_data[6])
+        for device_id in device_ids:
+            headers = {
+                'authorization': 'bearer ' + constants.APPLE_NOTIFICATION_TOKEN, 
+                'apns-topic': 'com.shoryamalani.fixate',
+                'apns-push-type': 'alert',
+                'apns-priority': '5',
+                'apns-expiration': '0',
+                'content-type': 'application/x-www-form-urlencoded',
+            }
 
+            data = {"aps":{"alert":{"title":title,"subtitle":subtitle,"body":body}}}
+
+            try:
+                requests.post("https://api.push.apple.com:443/3/device/"+device_id, headers=headers, data=data) 
+            except:
+                requests.post("https://api.development.push.apple.com:443/3/device/"+device_id, headers=headers, data=data)
     @staticmethod
     def get_leaderboard_data():
         # dbs_worker.get_all_public_users_share_data() # format is user_id, name, data

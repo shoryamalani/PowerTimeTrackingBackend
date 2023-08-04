@@ -269,6 +269,14 @@ def addPhone():
     user.add_phone_number(phone_id)
     return jsonify({'success': True, 'user_data': user.get_data_as_dict()})
 
+@app.route("/api/startFocusModeOnPhone")
+@authenticate
+def startFocusModeOnPhone():
+    j = request.get_json()
+    user:User = g.user
+    user.save_current_focus_mode(j['duration'],j['name'],j["type"])
+    user.send_notification_to_phone("Start your focus mode on your phone",j['name'],"Click to start the focus mode")
+    return jsonify({'success': True})
 
 
 if __name__ == "__main__":
