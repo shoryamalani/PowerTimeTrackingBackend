@@ -194,9 +194,11 @@ class User:
             print(headers)
             try:
                 print("https://api.push.apple.com:443/3/device/"+device_id)
-                requests.post("https://api.push.apple.com:443/3/device/"+device_id, headers=headers, data=data) 
+                url = "https://api.push.apple.com:443/3/device/"+device_id
+                requests.post(url, headers=headers, data=data) 
             except:
-                requests.post("https://api.development.push.apple.com:443/3/device/"+device_id, headers=headers, data=data)
+                print("https://api.development.push.apple.com:443/3/device/"+device_id)
+                requests.post(url, headers=headers, data=data)
     @staticmethod
     def get_leaderboard_data():
         # dbs_worker.get_all_public_users_share_data() # format is user_id, name, data
