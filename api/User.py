@@ -184,12 +184,13 @@ class User:
                 'apns-push-type': 'alert',
                 'apns-priority': '5',
                 'apns-expiration': '0',
-                'content-type': 'application/x-www-form-urlencoded',
+                # 'content-type': 'application/x-www-form-urlencoded',
             }
 
-            # data = {"aps":{"alert":{"title":title,"subtitle":subtitle,"body":body}}}
+            data = {"aps":{"alert":{"title":title,"subtitle":subtitle,"body":body}}}
+            data = json.dumps(data)
             # data = str(data).replace("'",'"')
-            data = '{"aps":{"alert":{"title":"'+title+'","subtitle":"'+subtitle+'","body":"'+body+'"}}}'
+            # data = '{"aps":{"alert":{"title":"'+title+'","subtitle":"'+subtitle+'","body":"'+body+'"}}}'
             print(data)
             print(headers)
             try:
