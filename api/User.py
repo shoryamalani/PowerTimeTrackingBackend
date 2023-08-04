@@ -141,7 +141,7 @@ class User:
         cur_data = self.get_data_as_dict()['mobile_devices']
         if cur_data == None:
             cur_data = {
-                'phone_id': [phone_number],
+                'phone_ids': [phone_number],
                 'settings': {
 
                 }

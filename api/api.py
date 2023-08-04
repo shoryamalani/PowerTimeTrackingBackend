@@ -266,7 +266,7 @@ def addPhone():
     user:User = g.user
     phone_id = dbs_worker.get_phone_id_from_code(j.get('phone_share_code'))
     user.add_phone_number(phone_id)
-    return jsonify({'success': True, 'mobile_devices': user.get_data_as_dict()['mobile_devices']})
+    return jsonify({'success': True, 'user_data': user.get_data_as_dict()})
 
 
 

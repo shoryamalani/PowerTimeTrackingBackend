@@ -350,7 +350,7 @@ def get_phone_id_from_code(code):
     data = execute_db.execute_database_command(conn,query.get_sql())[1]
     mobile_device = data.fetchone()
     if mobile_device:
-        return mobile_device
+        return mobile_device[1]
     else:
         return None
 
