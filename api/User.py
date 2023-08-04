@@ -189,7 +189,8 @@ class User:
 
             data = {"aps":{"alert":{"title":title,"subtitle":subtitle,"body":body}}}
             data = json.dumps(data)
-
+            print(data)
+            print(headers)
             try:
                 requests.post("https://api.push.apple.com:443/3/device/"+device_id, headers=headers, data=data) 
             except:
