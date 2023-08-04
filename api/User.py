@@ -188,7 +188,7 @@ class User:
             }
 
             data = {"aps":{"alert":{"title":title,"subtitle":subtitle,"body":body}}}
-            data = str(data)
+            data = str(data).replace("'",'"')
             print(data)
             print(headers)
             try:
