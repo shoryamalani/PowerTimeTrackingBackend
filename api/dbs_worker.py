@@ -180,6 +180,8 @@ def db_init():
         set_up_db_version_7(conn)
     if get_db_version(conn) < 8:
         set_up_db_version_8(conn)
+    if get_db_version(conn) < 9:
+        set_up_db_version_9(conn)
 
 def get_all_users():
     conn = set_up_connection()
