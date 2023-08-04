@@ -140,7 +140,7 @@ class User:
 
     def add_phone_number(self, phone_number):
         cur_data = self.get_data_as_dict()['mobile_devices']
-        if cur_data == None:
+        if cur_data == None or cur_data == {}:
             cur_data = {
                 'phone_ids': [phone_number],
                 'settings': {
