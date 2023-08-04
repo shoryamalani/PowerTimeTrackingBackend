@@ -369,7 +369,9 @@ def add_mobile_notification_code(device_id,notification_code):
 def add_mobile_connect_code(device_id,connect_code):
     conn = set_up_connection()
     mobile_devices = pypika.Table('mobile_devices')
-    query = Query.update(mobile_devices).set(mobile_devices.share_code,connect_code).set(mobile_devices.share_code_expiry,functions.Now() + datetime.timedelta(days=1)).where(mobile_devices.device_id == device_id)
+    # expiry time is 1 day
+    time = datetime.datetime.now() + datetime.timedelta(days=1)
+    query = Query.update(mobile_devices).set(mobile_devices.share_code,connect_code).set(mobile_devices.share_code_expiry,set_time_in_format(time)).where(mobile_devices.device_id == device_id)
     execute_db.execute_database_command(conn,query.get_sql())[0].commit()
 
 # time functions
