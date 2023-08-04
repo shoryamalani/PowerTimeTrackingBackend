@@ -22,6 +22,7 @@ class User:
         return user
 
     def get_data_as_dict(self):
+        dbs_worker.get_user_by_id(self.user_id)
         return {
             'user_id': self.user_data[0],
             'name': self.user_data[1],
