@@ -128,6 +128,12 @@ def set_up_db_version_8(conn):
     execute_db.execute_database_command(set_up_connection(),query_sql)[0].commit()
     set_db_version(8)
 
+def set_up_db_version_9(conn):
+    # add a user_id to the mobile_devices table
+    query_sql = "ALTER TABLE mobile_devices ADD COLUMN user_id int;"
+    execute_db.execute_database_command(set_up_connection(),query_sql)[0].commit()
+    set_db_version(9)
+
 
 
 
@@ -383,6 +389,12 @@ def add_mobile_connect_code(device_id,connect_code):
     # expiry time is 1 day
     time = datetime.datetime.now() + datetime.timedelta(days=1)
     query = Query.update(mobile_devices).set(mobile_devices.share_code,connect_code).set(mobile_devices.share_code_expiry,set_time_in_format(time)).where(mobile_devices.device_id == device_id)
+    execute_db.execute_database_command(conn,query.get_sql())[0].commit()
+
+def add_user_id_to_phone_id(user_id,phone_id):
+    conn = set_up_connection()
+    mobile_devices = pypika.Table('mobile_devices')
+    query = Query.update(mobile_devices).set(mobile_devices.user_id,user_id).where(mobile_devices.device_id == phone_id)
     execute_db.execute_database_command(conn,query.get_sql())[0].commit()
 
 # time functions
