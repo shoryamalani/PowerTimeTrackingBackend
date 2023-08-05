@@ -9,6 +9,7 @@ from apns2.credentials import TokenCredentials
 from apns2.client import APNsClient
 from apns2.payload import Payload
 import ssl
+import subprocess
 class User:
     user_data = None
     authenticated = False
@@ -182,27 +183,29 @@ class User:
             if get_phone_data[6] != None:
                 device_ids.append(get_phone_data[6])
                 # Create the APNs client
-        CERTIFICATE_FILE = constants.AUTH_FILE_PATH
-# check the file exists
-        print(CERTIFICATE_FILE)
-        import os
-        print(os.path.isfile(CERTIFICATE_FILE))
-        CERTIFICATE_PASSPHRASE = constants.APPLE_PASSPHRASE_NOTIFICATIONS
-        print(CERTIFICATE_PASSPHRASE)
-        
-        apns_client = APNsClient(CERTIFICATE_FILE, CERTIFICATE_PASSPHRASE)
- 
         # Set the appropriate APNs server endpoint (sandbox for development, production for live app)
         # Create a notification payload
-        payload = Payload(alert='Hello, this is a test notification!', sound='default', badge=1)
         
         # Send the notification
         for device_id in device_ids:
-            response = apns_client.send_notification(device_id, payload)
-            if response.is_successful:
-                print('Notification sent successfully!')
-            else:
-                print(f'Failed to send notification: {response.reason}')
+            curl_command = [
+                "curl",
+                "--cert", +'"'+constants.CERT_FILE_PATH+'"',
+                "--cert-type", "DER",
+                "--key", +'"'+constants.AUTH_FILE_PATH+'"',
+                "--key-type", "PEM",
+                "--header", "apns-topic: com.shoryamalani.fixate",
+                "--header", "apns-push-type: alert",
+                "--header", "apns-priority: 5",
+                "--header", "apns-expiration: 0",
+                "--data", '{"aps":{"alert":{"title":"'+title+'","subtitle":"'+subtitle+'","body":"'+body+'"}}}',
+                "--http2",
+                "https://api.development.push.apple.com:443/3/device/" + device_id
+            ]
+            try:
+                subprocess.run(curl_command, check=True)
+            except subprocess.CalledProcessError as e:
+                print("Error executing curl command:", e)
             pass
         # Close the APNs client
         apns_client.close()
