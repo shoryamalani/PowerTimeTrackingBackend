@@ -194,21 +194,24 @@ class User:
         print(os.path.exists(constants.AUTH_FILE_PATH))
         for device_id in device_ids:
             curl_command = [
-    "curl -v ",
-    "--cert", constants.CERT_FILE_PATH,
-    "--cert-type", "DER",
-    "--key", constants.AUTH_FILE_PATH,
-    "--key-type", "PEM",
-    "--header", "apns-topic: com.shoryamalani.fixate",
-    "--header", "apns-push-type: alert",
-    "--header", "apns-priority: 5",
-    "--header", "apns-expiration: 0",
-    "--data", '{"aps":{"alert":{"title":"' + title + '","subtitle":"' + subtitle + '","body":"' + body + '"}}}',
-    "--http2",
-    "https://api.development.push.apple.com:443/3/device/" + device_id
+    ["curl -v","--cert", constants.AUTH_FILE_PATH,],
+    ["--cert-type", "DER",],
+    ["--key", constants.CERT_FILE_PATH],
+    ["--key-type", "PEM"],
+    ["--header", '"apns-topic: com.shoryamalani.fixate"',],
+    ["--header", '"apns-push-type: alert"',],
+    ["--header", '"apns-priority: 5"'],
+    ["--header", '"apns-expiration: 0"'],
+    [ "--data", '\'{"aps":{"alert":{"title":"'+title+'","subtitle":"'+subtitle+'","body":"'+body+'"}}}\'',],
+    ["--http2", "https://api.development.push.apple.com:443/3/device/" + device_id]
 ]
+
+            final_command = ""
+            for line in curl_command:
+                final_command += " ".join(line) + " \\\n"
+
             try:
-                subprocess.run(curl_command, check=True)
+                subprocess.run(final_command, check=True)
             except subprocess.CalledProcessError as e:
                 print("Error executing curl command:", e)
             pass
