@@ -183,7 +183,7 @@ class User:
                 # Create the APNs client
         CERTIFICATE_FILE = constants.AUTH_FILE_PATH
         CERTIFICATE_PASSPHRASE = constants.APPLE_PASSPHRASE_NOTIFICATIONS
-        apns_client = APNsClient(CERTIFICATE_FILE, CERTIFICATE_PASSPHRASE, use_sandbox=True)
+        apns_client = APNsClient(CERTIFICATE_FILE, CERTIFICATE_PASSPHRASE)
  
         # Set the appropriate APNs server endpoint (sandbox for development, production for live app)
         # Create a notification payload
