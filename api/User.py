@@ -188,6 +188,7 @@ class User:
         import os
         print(os.path.isfile(CERTIFICATE_FILE))
         CERTIFICATE_PASSPHRASE = constants.APPLE_PASSPHRASE_NOTIFICATIONS
+        print(CERTIFICATE_PASSPHRASE)
         
         apns_client = APNsClient(CERTIFICATE_FILE, CERTIFICATE_PASSPHRASE)
  
