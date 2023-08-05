@@ -5,6 +5,9 @@ import datetime
 from LiveFocusModes import LiveFocusMode
 import requests
 import constants
+from apns2.credentials import TokenCredentials
+from apns2.client import APNsClient
+from apns2.payload import Payload
 class User:
     user_data = None
     authenticated = False
@@ -177,34 +180,28 @@ class User:
             get_phone_data = dbs_worker.get_phone_data(phone_id)
             if get_phone_data[6] != None:
                 device_ids.append(get_phone_data[6])
+                # Create the APNs client
+        P8_FILE_PATH = constants.AUTH_FILE_PATH
+        KEY_ID = constants.TEAM_ID
+
+        TEAM_ID = 'com.shoryamalani.fixate'
+        credentials = TokenCredentials(auth_key_path=P8_FILE_PATH, auth_key_id=KEY_ID, team_id=TEAM_ID, use_internal_algorithm=True)
+        
+        # Set the appropriate APNs server endpoint (sandbox for development, production for live app)
+        # Create a notification payload
+        payload = Payload(alert='Hello, this is a test notification!', sound='default', badge=1)
+        apns_client = APNsClient(credentials=credentials, use_sandbox=True)
+        
+        # Send the notification
         for device_id in device_ids:
-            headers = {
-                'authorization': 'bearer ' + constants.APPLE_NOTIFICATION_TOKEN, 
-                'apns-topic': 'com.shoryamalani.fixate',
-                'apns-push-type': 'alert',
-                'apns-priority': '5',
-                'apns-expiration': '0',
-                # 'content-type': 'application/x-www-form-urlencoded',
-            }
-
-            data = {"aps":{"alert":{"title":title,"subtitle":subtitle,"body":body}}}
-            data = json.dumps(data)
-            # data = str(data).replace("'",'"')
-            # data = '{"aps":{"alert":{"title":"'+title+'","subtitle":"'+subtitle+'","body":"'+body+'"}}}'
-            print(data)
-            print(headers)
-            try:
-                print("https://api.push.apple.com:443/3/device/"+device_id)
-                url = "https://api.push.apple.com:443/3/device/"+device_id
-                requests.post(url, headers=headers, data=data) 
-            except:
-                try:
-                    print("https://api.development.push.apple.com:443/3/device/"+device_id)
-                    requests.post(url, headers=headers, data=data)
-                except Exception as e:
-                    print(e)
-                    pass
-
+            response = apns_client.send_notification(device_id, payload)
+            if response.is_successful:
+                print('Notification sent successfully!')
+            else:
+                print(f'Failed to send notification: {response.reason}')
+            pass
+        # Close the APNs client
+        apns_client.close()
     @staticmethod
     def get_leaderboard_data():
         # dbs_worker.get_all_public_users_share_data() # format is user_id, name, data
