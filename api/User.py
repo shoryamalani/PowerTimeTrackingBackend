@@ -187,6 +187,11 @@ class User:
         # Create a notification payload
         
         # Send the notification
+        print(constants.CERT_FILE_PATH)
+        import os
+        print(os.path.exists(constants.CERT_FILE_PATH))
+        print(constants.AUTH_FILE_PATH)
+        print(os.path.exists(constants.AUTH_FILE_PATH))
         for device_id in device_ids:
             curl_command = [
                 "curl",
@@ -208,7 +213,6 @@ class User:
                 print("Error executing curl command:", e)
             pass
         # Close the APNs client
-        apns_client.close()
     @staticmethod
     def get_leaderboard_data():
         # dbs_worker.get_all_public_users_share_data() # format is user_id, name, data
