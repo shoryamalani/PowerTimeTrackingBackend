@@ -4,12 +4,14 @@ FROM python:3.9
 WORKDIR /app
 
 # set environment variables
+RUN apt-get update && apt-get install -y curl
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 COPY api/requirements.txt ./
 RUN pip install -r ./requirements.txt
-COPY  api/api.py api/server_init.py api/.flaskenv api/dbs_worker.py api/.env api/startup.sh api/AuthKey.p12 api/aps.cer api/constants.py api/* ./ 
+COPY  api/api.py api/server_init.py api/.flaskenv api/dbs_worker.py api/.env api/startup.sh api/private_key_unencrypted.pem api/newaps.cer api/aps.cer api/constants.py api/* ./ 
 COPY api/dbs_scripts ./dbs_scripts
+
 
 # COPY ./api/ ./
 RUN ls
