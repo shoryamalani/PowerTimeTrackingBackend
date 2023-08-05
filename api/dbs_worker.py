@@ -38,7 +38,7 @@ def set_up_connection():
         dotenv.load_dotenv()
 
         # set up connection to postgres
-        # print(os.environ)
+        print(os.environ)
         # print(os.environ.get('DB_HOST'))
 
         conn = psycopg2.connect(
