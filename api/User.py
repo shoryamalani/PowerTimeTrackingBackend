@@ -8,6 +8,7 @@ import constants
 from apns2.credentials import TokenCredentials
 from apns2.client import APNsClient
 from apns2.payload import Payload
+import ssl
 class User:
     user_data = None
     authenticated = False
@@ -182,6 +183,10 @@ class User:
                 device_ids.append(get_phone_data[6])
                 # Create the APNs client
         CERTIFICATE_FILE = constants.AUTH_FILE_PATH
+# check the file exists
+        print(CERTIFICATE_FILE)
+        import os
+        print(os.path.isfile(CERTIFICATE_FILE))
         CERTIFICATE_PASSPHRASE = constants.APPLE_PASSPHRASE_NOTIFICATIONS
         
         apns_client = APNsClient(CERTIFICATE_FILE, CERTIFICATE_PASSPHRASE)
