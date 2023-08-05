@@ -20,4 +20,5 @@ psycopg2-binary
 flask-socketio
 flask-cors
 eventlet==0.29.1
-
+cryptography
+apns2
