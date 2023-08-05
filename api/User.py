@@ -194,7 +194,7 @@ class User:
         print(os.path.exists(constants.AUTH_FILE_PATH))
         for device_id in device_ids:
             curl_command = [
-    "curl -v \\",
+    "curl -v ",
     "--cert", constants.CERT_FILE_PATH,
     "--cert-type", "DER",
     "--key", constants.AUTH_FILE_PATH,
