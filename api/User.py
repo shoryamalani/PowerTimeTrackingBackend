@@ -190,9 +190,9 @@ class User:
         for device_id in device_ids:
             curl_command = [
                 "curl",
-                "--cert", +'"'+constants.CERT_FILE_PATH+'"',
+                "--cert", '"'+constants.CERT_FILE_PATH+'"',
                 "--cert-type", "DER",
-                "--key", +'"'+constants.AUTH_FILE_PATH+'"',
+                "--key", '"'+constants.AUTH_FILE_PATH+'"',
                 "--key-type", "PEM",
                 "--header", "apns-topic: com.shoryamalani.fixate",
                 "--header", "apns-push-type: alert",
