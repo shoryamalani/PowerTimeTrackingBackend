@@ -211,7 +211,7 @@ class User:
                 final_command += " ".join(line) + " \\\n"
 
             try:
-                subprocess.run(final_command, check=True)
+                subprocess.run(final_command, shell=True)
             except subprocess.CalledProcessError as e:
                 print("Error executing curl command:", e)
             pass
