@@ -185,7 +185,7 @@ class User:
         KEY_ID = constants.TEAM_ID
 
         TEAM_ID = 'com.shoryamalani.fixate'
-        credentials = TokenCredentials(auth_key_path=P8_FILE_PATH, auth_key_id=KEY_ID, team_id=TEAM_ID, use_internal_algorithm=True)
+        credentials = TokenCredentials(auth_key_path=P8_FILE_PATH, auth_key_id=KEY_ID, team_id=TEAM_ID)
         
         # Set the appropriate APNs server endpoint (sandbox for development, production for live app)
         # Create a notification payload
