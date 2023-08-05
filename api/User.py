@@ -181,16 +181,13 @@ class User:
             if get_phone_data[6] != None:
                 device_ids.append(get_phone_data[6])
                 # Create the APNs client
-        P8_FILE_PATH = constants.AUTH_FILE_PATH
-        KEY_ID = constants.TEAM_ID
-
-        TEAM_ID = 'com.shoryamalani.fixate'
-        credentials = TokenCredentials(auth_key_path=P8_FILE_PATH, auth_key_id=KEY_ID, team_id=TEAM_ID)
-        
+        CERTIFICATE_FILE = constants.AUTH_FILE_PATH
+        CERTIFICATE_PASSPHRASE = constants.APPLE_PASSPHRASE_NOTIFICATIONS
+        apns_client = APNsClient(CERTIFICATE_FILE, CERTIFICATE_PASSPHRASE, use_sandbox=True)
+ 
         # Set the appropriate APNs server endpoint (sandbox for development, production for live app)
         # Create a notification payload
         payload = Payload(alert='Hello, this is a test notification!', sound='default', badge=1)
-        apns_client = APNsClient(credentials=credentials, use_sandbox=True)
         
         # Send the notification
         for device_id in device_ids:
