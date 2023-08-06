@@ -399,6 +399,20 @@ def add_user_id_to_phone_id(user_id,phone_id):
     query = Query.update(mobile_devices).set(mobile_devices.user_id,user_id).where(mobile_devices.device_id == phone_id)
     execute_db.execute_database_command(conn,query.get_sql())[0].commit()
 
+def get_user_id_from_device_id(device_id):
+    conn = set_up_connection()
+    mobile_devices = pypika.Table('mobile_devices')
+    query = Query.from_(mobile_devices).select('*').where(mobile_devices.device_id == device_id)
+    data = execute_db.execute_database_command(conn,query.get_sql())[1]
+    mobile_device = data.fetchone()
+    if mobile_device:
+        if mobile_device[8]:
+            return mobile_device[8]
+        if mobile_device[8] == None:
+            return None
+    else:
+        return None
+
 def get_phone_data(phone_id):
     conn = set_up_connection()
     mobile_devices = pypika.Table('mobile_devices')

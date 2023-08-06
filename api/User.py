@@ -14,11 +14,15 @@ class User:
     user_data = None
     authenticated = False
     def __init__(self, user_id, device_id):
-       self.user_data = dbs_worker.get_user_by_id(user_id)
-       self.user_id = user_id
-       if self.get_data_as_dict()['data'] != None:
-           if device_id in self.get_data_as_dict()['data']['devices']:
-               self.authenticated = True
+        self.user_data = dbs_worker.get_user_by_id(user_id)
+        self.user_id = user_id
+        if self.get_data_as_dict()['data'] != None:
+            if device_id in self.get_data_as_dict()['data']['devices']:
+                self.authenticated = True
+        if self.get_data_as_dict()['mobile_devices'] != None:
+            if device_id in self.get_data_as_dict()['mobile_devices']['phone_ids']:
+                self.authenticated = True
+        
     
     @classmethod
     def create_user(cls, name,privacy_status, device_id):
@@ -216,6 +220,19 @@ class User:
                 print("Error executing curl command:", e)
             pass
         # Close the APNs client
+    
+    def is_running_focus_mode(self):
+        cur_data = self.get_data_as_dict()['data']
+        if 'current_focus_mode' in cur_data:
+            if cur_data['current_focus_mode'] == None:
+                return False
+            else:
+                if dbs_worker.get_time_from_format(cur_data['current_focus_mode']['start_time']) + datetime.timedelta(seconds=cur_data['current_focus_mode']['duration']) > dbs_worker.get_current_time():
+                    return cur_data['current_focus_mode']
+                else:
+                    return False
+        else:
+            return False
     @staticmethod
     def get_leaderboard_data():
         # dbs_worker.get_all_public_users_share_data() # format is user_id, name, data
