@@ -165,12 +165,16 @@ class User:
                 else:
                     cur_data['phone_ids'] = [phone_number, *cur_data['phone_ids']]
         dbs_worker.set_user_mobile_devices(self.user_id, cur_data)
-    def save_current_focus_mode(self,duration,name,type):
+    def save_current_focus_mode(self,duration,name,type,id):
 
         cur_data = self.get_data_as_dict()['data']
-        cur_data['current_focus_mode'] = {'duration':duration,'name':name,'type':type,'start_time':dbs_worker.get_current_time()}
+        cur_data['current_focus_mode'] = {'duration':duration,'name':name,'type':type,'start_time':dbs_worker.get_current_time(),'id':id,"active":True}
         dbs_worker.set_user_data(self.user_id, cur_data)
-    
+    def stop_focus_mode(self):
+        cur_data = self.get_data_as_dict()['data']
+        if 'current_focus_mode' in cur_data:
+            cur_data['current_focus_mode']['active'] = False
+        dbs_worker.set_user_data(self.user_id, cur_data)
     def send_notification_to_phone(self,title,subtitle,body):
 #         curl -v \
 #   --header "authorization: bearer ${AUTHENTICATION_TOKEN}" \
