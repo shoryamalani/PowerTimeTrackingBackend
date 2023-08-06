@@ -278,7 +278,7 @@ def startFocusModeOnPhone():
     user.send_notification_to_phone("Start your focus mode on your phone",j['name'],"Click to start the focus mode")
     return jsonify({'success': True})
 
-@app.route("/api/stopFocusModeOnPhone", methods=['POST'])
+@app.route("/api/endFocusModeOnPhone", methods=['POST'])
 @authenticate
 def stopFocusModeOnPhone():
     j = request.get_json()
