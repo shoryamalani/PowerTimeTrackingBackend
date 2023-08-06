@@ -66,7 +66,7 @@ def isFocusModeRunning():
     if userId is None:
         return jsonify({'status': 'error'}), 400
     focus_mode = User(userId,device_id).is_running_focus_mode()
-    if focus_mode is None:
+    if focus_mode is None or focus_mode == False:
        return jsonify({'status': 'error'}), 400 
     else:
         return jsonify({'status': 'success', 'focus_mode_name': focus_mode['name'],'focus_mode_duration': focus_mode['duration'],'focus_mode_type': focus_mode['type'],'focus_mode_start_time': focus_mode['start_time']})
