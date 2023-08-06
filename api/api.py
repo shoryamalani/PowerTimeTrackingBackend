@@ -283,7 +283,7 @@ def startFocusModeOnPhone():
 def stopFocusModeOnPhone():
     j = request.get_json()
     user:User = g.user
-    user.stop_focus_mode(j['id'])
+    user.stop_focus_mode()
     return jsonify({'success': True})
 
 if __name__ == "__main__":
