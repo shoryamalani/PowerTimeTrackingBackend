@@ -231,7 +231,7 @@ class User:
             if cur_data['current_focus_mode'] == None:
                 return False
             else:
-                if dbs_worker.get_time_from_format(cur_data['current_focus_mode']['start_time']) + datetime.timedelta(seconds=cur_data['current_focus_mode']['duration']) < datetime.datetime.now():
+                if dbs_worker.get_time_from_format(cur_data['current_focus_mode']['start_time']) + datetime.timedelta(minutes=int(cur_data['current_focus_mode']['duration'])) < datetime.datetime.now():
                     return cur_data['current_focus_mode']
                 else:
                     return False
