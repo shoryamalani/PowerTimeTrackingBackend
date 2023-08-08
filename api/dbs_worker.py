@@ -427,11 +427,14 @@ def get_phone_data(phone_id):
 def check_if_device_has_computer_attached(device_id):
     conn = set_up_connection()
     mobile_devices = pypika.Table('mobile_devices')
-    query = Query.from_(mobile_devices).select('*').where(mobile_devices.device_id == device_id).where(mobile_devices.user_id != None)
+    query = Query.from_(mobile_devices).select('*').where(mobile_devices.device_id == device_id)
     data = execute_db.execute_database_command(conn,query.get_sql())[1]
     mobile_device = data.fetchone()
     if mobile_device:
-        return True
+        if mobile_device[8]:
+            return True
+        else:
+            return False
     else:
         return False
 
