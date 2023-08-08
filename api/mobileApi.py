@@ -52,7 +52,8 @@ def getPhoneConnectCode():
     else:
         connect_code = random.randint(100000, 999999)
         dbs_worker.add_mobile_connect_code(device_id, connect_code)
-        return jsonify({'status': 'success', 'connect_code': connect_code})
+        hasComp = dbs_worker.check_if_device_has_computer_attached(device_id)
+        return jsonify({'status': 'success', 'connect_code': connect_code, 'hasComputer': hasComp})
 
 @mobileApp.route('/isFocusModeRunning', methods=['GET','POST'])
 def isFocusModeRunning():

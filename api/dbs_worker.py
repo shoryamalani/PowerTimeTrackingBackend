@@ -424,6 +424,17 @@ def get_phone_data(phone_id):
     else:
         return None
 
+def check_if_device_has_computer_attached(device_id):
+    conn = set_up_connection()
+    mobile_devices = pypika.Table('mobile_devices')
+    query = Query.from_(mobile_devices).select('*').where(mobile_devices.device_id == device_id).where(mobile_devices.user_id != None)
+    data = execute_db.execute_database_command(conn,query.get_sql())[1]
+    mobile_device = data.fetchone()
+    if mobile_device:
+        return True
+    else:
+        return False
+
 # time functions
 def get_current_time():
     return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
