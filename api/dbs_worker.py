@@ -118,7 +118,7 @@ def set_up_db_version_7(conn):
     # change mobile_device_id to mobile_devices and change type to json
     query_sql = "ALTER TABLE users RENAME COLUMN mobile_device_id TO mobile_devices;"
     execute_db.execute_database_command(set_up_connection(),query_sql)[0].commit()
-    query_sql = "ALTER TABLE users ALTER COLUMN mobile_devices::json TYPE json USING mobile_devices;"
+    query_sql = "ALTER TABLE users ALTER COLUMN mobile_devices TYPE json USING mobile_devices::json;"
     execute_db.execute_database_command(set_up_connection(),query_sql)[0].commit()
     set_db_version(7)
 
