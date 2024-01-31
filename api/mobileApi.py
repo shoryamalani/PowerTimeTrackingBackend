@@ -49,7 +49,7 @@ def getPhoneConnectCode():
     cur = dbs_worker.check_if_device_id_exists(device_id)
     if cur is None:
         return jsonify({'status': 'error'}), 400
-    else:
+    else :
         connect_code = random.randint(100000, 999999)
         dbs_worker.add_mobile_connect_code(device_id, connect_code)
         hasComp = dbs_worker.check_if_device_has_computer_attached(device_id)

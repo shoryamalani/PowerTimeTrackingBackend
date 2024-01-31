@@ -285,6 +285,10 @@ def stopFocusModeOnPhone():
     user:User = g.user
     user.stop_focus_mode()
     return jsonify({'success': True})
-
+@app.route("/api/hasUser", methods=['POST'])
+def hasUser():
+    j = request.get_json()
+    user = dbs_worker.get_user_by_id(j.get('user_id'))
+    return jsonify({'has_user': user != None})
 if __name__ == "__main__":
     app.run(port=5008, debug=True)
