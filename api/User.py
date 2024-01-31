@@ -29,7 +29,7 @@ class User:
     @classmethod
     def create_user(cls, name,privacy_status, device_id):
 
-        user_id = dbs_worker.create_user(name,privacy_status, {'devices': [device_id],"share_code":str(uuid.uuid4())})
+        user_id = dbs_worker.create_user(name,privacy_status, {'devices': [device_id],"share_code":str(uuid.uuid4()),"friends":[]})
         print(user_id)
         user = cls(user_id, device_id)
         return user
@@ -73,10 +73,12 @@ class User:
     def get_friend_data(self):
         friend_data = []
         if 'friends' in self.get_data_as_dict()['data']:
+            if self.get_data_as_dict()['data']['friends'] == None:
+                cur_data = self.get_data_as_dict()['data']
+                cur_data['friends'] = []
+                dbs_worker.set_user_data(self.user_id, cur_data)
             for friend in self.get_data_as_dict()['data']['friends']:
                 friend_data.append(User(friend,None).get_friend_sharable_data())
-        else:
-            return None
         cur_data = self.get_data_as_dict()['data']
         cur_data['friends_data'] = {'data':friend_data,'last_updated':dbs_worker.get_current_time()}
         dbs_worker.set_user_data(self.user_id, cur_data)    
