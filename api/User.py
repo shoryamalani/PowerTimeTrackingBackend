@@ -15,6 +15,8 @@ class User:
     authenticated = False
     def __init__(self, user_id, device_id):
         self.user_data = dbs_worker.get_user_by_id(user_id)
+        if self.user_data == None:
+            return None
         self.user_id = user_id
         if self.get_data_as_dict()['data'] != None:
             if device_id in self.get_data_as_dict()['data']['devices']:
@@ -35,7 +37,7 @@ class User:
     def get_data_as_dict(self):
         dbs_worker.get_user_by_id(self.user_id)
         if self.user_data == None:
-            return {}
+            return None
         return {
             'user_id': self.user_data[0],
             'name': self.user_data[1],
