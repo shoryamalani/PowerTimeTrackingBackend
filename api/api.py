@@ -31,6 +31,11 @@ def authenticate(f):
             print("user_id: " + str(user_id))
             print("device_id: " + str(device_id))
             return jsonify({'error': 'bad request'}), 400
+        if user_id == "":
+            print("bad request")
+            print("user_id: " + str(user_id))
+            print("device_id: " + str(device_id))
+            return jsonify({'error': 'bad request'}), 400
         user = User(user_id, device_id)
         if user.authenticated:
             g.user = user
