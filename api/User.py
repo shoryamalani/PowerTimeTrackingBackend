@@ -34,6 +34,8 @@ class User:
 
     def get_data_as_dict(self):
         dbs_worker.get_user_by_id(self.user_id)
+        if self.user_data == None:
+            return {}
         return {
             'user_id': self.user_data[0],
             'name': self.user_data[1],
