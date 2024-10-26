@@ -62,7 +62,7 @@ class User:
             if friend_id in cur_data['friends']:
                 pass
             else:
-                cur_data['friends'] = [friend_id, *cur_data['friends']]
+                cur_data['friends'].append(friend_id)
                 print('added friend')
                 print(cur_data['friends'])
         else:
